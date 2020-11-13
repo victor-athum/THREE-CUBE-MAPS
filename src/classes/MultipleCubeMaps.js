@@ -102,13 +102,13 @@ class CubeMap {
     );
     this.skyboxBack.name = "back";
     this.skyboxRight.position.x = 1100;
-    this.skyboxRight.rotation.y = 125;
+    this.skyboxRight.rotation.y = 128;
     this.skyboxLeft.position.x = -1100;
-    this.skyboxLeft.rotation.y = 125;
+    this.skyboxLeft.rotation.y = 128;
     this.skyboxFront.position.z = 1100;
-    this.skyboxFront.rotation.y = 125;
+    this.skyboxFront.rotation.y = 128;
     this.skyboxBack.position.z = -1100;
-    this.skyboxBack.rotation.y = 125;
+    this.skyboxBack.rotation.y = 128;
     this.scene.add(this.skyboxMiddle);
     this.scene.add(this.skyboxRight);
     this.scene.add(this.skyboxLeft);
