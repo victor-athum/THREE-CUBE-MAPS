@@ -46,28 +46,42 @@ class CubeMap {
     const intersects = this.raycaster.intersectObjects(this.scene.children);
     if (intersects.length > 0) {
       const object = intersects[0].object;
-      if (object.name !== "middle" && object.name !== "hotspot") {
+      if (
+        object.name !== "middle" &&
+        object.name !== "hotspot" &&
+        !this.hotspotExist(object.name)
+      ) {
         this.createHotspot({
           x: object.position.x,
           y: -10,
           z: object.position.z,
-          name: "test",
+          name: `${object.name}-hotspot`,
           key: "test",
           img: DataImage.Arrow,
           level: 1,
         });
-      } else if (object.name !== "hotspot") {
-        this.clearCube();
       }
 
-      console.log("object", object);
+      console.log("object", this.scene);
     }
+  };
+
+  hotspotExist = (name) => {
+    let exist = false;
+    for (var i = this.scene.children.length - 1; i >= 0; i--) {
+      const children = this.scene.children[i];
+      if (children.name === `${name}-hotspot`) {
+        exist = true;
+        break;
+      }
+    }
+    return exist;
   };
 
   clearCube = () => {
     for (var i = this.scene.children.length - 1; i >= 0; i--) {
       const children = this.scene.children[i];
-      if (children.name === "hotspot") {
+      if (children.name.includes("hotspot")) {
         this.scene.remove(children);
       }
     }
@@ -223,7 +237,7 @@ class CubeMap {
       map: texture,
     });
     const sprite = new THREE.Sprite(spriteMaterial);
-    sprite.name = "hotspot";
+    sprite.name = name;
     sprite.isHotspot = true;
     sprite.key = key;
     sprite.position.copy(point.clone().normalize().multiplyScalar(10));
