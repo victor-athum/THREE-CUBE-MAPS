@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import DataImage from "../assets/Data";
 import Stats from "three/examples/jsm/libs/stats.module";
+import Tween from "@tweenjs/tween.js";
 
 const px = require("../assets/px.jpg");
 const nx = require("../assets/nx.jpg");
@@ -24,6 +25,7 @@ class CubeMap {
     this.initStats();
     this.container.appendChild(this.renderer.domElement);
     this.container.addEventListener("mousemove", this.onMouseMove, false);
+    this.container.addEventListener("pointerdown", this.clearCube, false);
     this.initControls();
     window.addEventListener("resize", this.onWindowResize, false);
   };
@@ -40,21 +42,34 @@ class CubeMap {
 
   onMouseMove = (event) => {
     this.getMouse(event);
-    this.displayPosition();
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster.intersectObjects(this.scene.children);
     if (intersects.length > 0) {
       const object = intersects[0].object;
-      this.createHotspot({
-        x: 0,
-        y: 0,
-        z: 0,
-        name: "test",
-        key: "test",
-        img: DataImage.Arrow,
-        level: 1,
-      });
+      if (object.name !== "middle" && object.name !== "hotspot") {
+        this.createHotspot({
+          x: object.position.x,
+          y: -10,
+          z: object.position.z,
+          name: "test",
+          key: "test",
+          img: DataImage.Arrow,
+          level: 1,
+        });
+      } else if (object.name !== "hotspot") {
+        this.clearCube();
+      }
+
       console.log("object", object);
+    }
+  };
+
+  clearCube = () => {
+    for (var i = this.scene.children.length - 1; i >= 0; i--) {
+      const children = this.scene.children[i];
+      if (children.name === "hotspot") {
+        this.scene.remove(children);
+      }
     }
   };
 
@@ -85,39 +100,40 @@ class CubeMap {
 
   initSkybox = async (materialArray) => {
     const skyBoxGeometry = new THREE.BoxBufferGeometry(1000, 1000, 1000);
+    const outerBoxGeometry = new THREE.BoxBufferGeometry(600, 600, 600);
     this.skyboxMiddle = new THREE.Mesh(skyBoxGeometry, materialArray);
     this.skyboxMiddle.name = "middle";
     const meshOptions = {
-      opacity: 0,
-      transparent: true,
+      opacity: 1,
+      transparent: false,
     };
     this.skyboxRight = new THREE.Mesh(
-      skyBoxGeometry,
+      outerBoxGeometry,
       new THREE.MeshPhongMaterial(meshOptions)
     );
     this.skyboxRight.name = "right";
     this.skyboxLeft = new THREE.Mesh(
-      skyBoxGeometry,
+      outerBoxGeometry,
       new THREE.MeshPhongMaterial(meshOptions)
     );
     this.skyboxLeft.name = "left";
     this.skyboxFront = new THREE.Mesh(
-      skyBoxGeometry,
+      outerBoxGeometry,
       new THREE.MeshPhongMaterial(meshOptions)
     );
     this.skyboxFront.name = "front";
     this.skyboxBack = new THREE.Mesh(
-      skyBoxGeometry,
+      outerBoxGeometry,
       new THREE.MeshPhongMaterial(meshOptions)
     );
     this.skyboxBack.name = "back";
-    this.skyboxRight.position.x = 900;
+    this.skyboxRight.position.x = 780;
     // this.skyboxRight.rotation.y = 128;
-    this.skyboxLeft.position.x = -900;
+    this.skyboxLeft.position.x = -780;
     // this.skyboxLeft.rotation.y = 128;
-    this.skyboxFront.position.z = 900;
+    this.skyboxFront.position.z = 780;
     // this.skyboxFront.rotation.y = 128;
-    this.skyboxBack.position.z = -900;
+    this.skyboxBack.position.z = -780;
     // this.skyboxBack.rotation.y = 128;
     this.scene.add(this.skyboxMiddle);
     this.scene.add(this.skyboxRight);
@@ -207,14 +223,30 @@ class CubeMap {
       map: texture,
     });
     const sprite = new THREE.Sprite(spriteMaterial);
-    sprite.name = name;
+    sprite.name = "hotspot";
     sprite.isHotspot = true;
     sprite.key = key;
     sprite.position.copy(point.clone().normalize().multiplyScalar(10));
     if (level) {
       sprite.level = level;
     }
-    this.skyboxMiddle.add(sprite);
+    this.scale(sprite);
+    this.scene.add(sprite);
   };
+
+  scale = (sprite) =>
+    new Tween.Tween(sprite.scale)
+      .to(
+        {
+          x: sprite.scale.x * 0.5,
+          y: sprite.scale.y * 0.5,
+          z: sprite.scale.z * 0.5,
+        },
+        500
+      )
+      .onUpdate(() => {
+        this.render();
+      })
+      .easing(Tween.Easing.Elastic.Out);
 }
 export default CubeMap;
