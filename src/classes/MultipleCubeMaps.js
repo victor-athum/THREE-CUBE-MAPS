@@ -48,7 +48,7 @@ class CubeMap {
       const object = intersects[0].object;
       if (
         object.name !== "middle" &&
-        object.name !== "hotspot" &&
+        !object.name.includes("hotspot") &&
         !this.hotspotExist(object.name)
       ) {
         this.createHotspot({
