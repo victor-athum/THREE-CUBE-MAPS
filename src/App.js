@@ -1,28 +1,16 @@
-import React, { Component } from "react";
-import MultipleCubeMaps from "./classes/MultipleCubeMaps";
-import "./App.css";
+import React from 'react';
+import { Provider } from 'react-redux';
+import { CookiesProvider } from 'react-cookie';
+import AppRouter from './routers/AppRouter';
+import configureStore from './stores/rootStore';
+import './App.css';
 
-class App extends Component {
-  constructor() {
-    super();
-    this.container = null;
-  }
-  componentDidMount() {
-    const cube = new MultipleCubeMaps(this.container);
-    cube.init();
-    cube.animate();
-  }
+const jsx = () => (
+  <CookiesProvider>
+    <Provider store={configureStore()}>
+      <AppRouter />
+    </Provider>
+  </CookiesProvider>
+);
 
-  render() {
-    return (
-      <div
-        className="App"
-        ref={(ref) => {
-          this.container = ref;
-        }}
-      />
-    );
-  }
-}
-
-export default App;
+export default jsx;
