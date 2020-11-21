@@ -1,33 +1,34 @@
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import DataImage from "../assets/Data";
-import Stats from "three/examples/jsm/libs/stats.module";
-import Tween from "@tweenjs/tween.js";
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Stats from 'three/examples/jsm/libs/stats.module';
+import Tween from '@tweenjs/tween.js';
+import DataImage from '../assets/Data';
 
-const px = require("../assets/px.jpg");
-const nx = require("../assets/nx.jpg");
-const py = require("../assets/py.jpg");
-const ny = require("../assets/ny.jpg");
-const pz = require("../assets/pz.jpg");
-const nz = require("../assets/nz.jpg");
+const px = require('../assets/px.jpg');
+const nx = require('../assets/nx.jpg');
+const py = require('../assets/py.jpg');
+const ny = require('../assets/ny.jpg');
+const pz = require('../assets/pz.jpg');
+const nz = require('../assets/nz.jpg');
 
 class CubeMap {
   constructor(container) {
     this.container = container;
   }
 
-  init = () => {
+  init = (urls) => {
     this.initScene();
     this.initCamera();
+    this.setImages(urls);
     this.createMaterialArray();
     this.initializeRaycaster();
     this.initRenderer();
     this.initStats();
     this.container.appendChild(this.renderer.domElement);
-    this.container.addEventListener("mousemove", this.onMouseMove, false);
-    this.container.addEventListener("pointerdown", this.clearCube, false);
+    this.container.addEventListener('mousemove', this.onMouseMove, false);
+    this.container.addEventListener('pointerdown', this.clearCube, false);
     this.initControls();
-    window.addEventListener("resize", this.onWindowResize, false);
+    window.addEventListener('resize', this.onWindowResize, false);
   };
 
   getMouse = (event) => {
@@ -45,10 +46,10 @@ class CubeMap {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster.intersectObjects(this.scene.children);
     if (intersects.length > 0) {
-      const object = intersects[0].object;
+      const { object } = intersects[0];
       if (
-        object.name !== "middle" &&
-        !object.name.includes("hotspot") &&
+        object.name !== 'middle' &&
+        !object.name.includes('hotspot') &&
         !this.hotspotExist(object.name)
       ) {
         this.createHotspot({
@@ -56,19 +57,19 @@ class CubeMap {
           y: -10,
           z: object.position.z,
           name: `${object.name}-hotspot`,
-          key: "test",
+          key: 'test',
           img: DataImage.Arrow,
-          level: 1,
+          level: 1
         });
       }
 
-      console.log("object", this.scene);
+      console.log('object', this.scene);
     }
   };
 
   hotspotExist = (name) => {
     let exist = false;
-    for (var i = this.scene.children.length - 1; i >= 0; i--) {
+    for (let i = this.scene.children.length - 1; i >= 0; i -= 1) {
       const children = this.scene.children[i];
       if (children.name === `${name}-hotspot`) {
         exist = true;
@@ -79,9 +80,9 @@ class CubeMap {
   };
 
   clearCube = () => {
-    for (var i = this.scene.children.length - 1; i >= 0; i--) {
+    for (let i = this.scene.children.length - 1; i >= 0; i -= 1) {
       const children = this.scene.children[i];
-      if (children.name.includes("hotspot")) {
+      if (children.name.includes('hotspot')) {
         this.scene.remove(children);
       }
     }
@@ -89,7 +90,7 @@ class CubeMap {
 
   initScene = () => {
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color("white");
+    this.scene.background = new THREE.Color('white');
   };
 
   initCamera = () => {
@@ -103,7 +104,7 @@ class CubeMap {
   };
 
   initRenderer = () => {
-    //renderer
+    // renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(
@@ -116,31 +117,31 @@ class CubeMap {
     const skyBoxGeometry = new THREE.BoxBufferGeometry(1000, 1000, 1000);
     const outerBoxGeometry = new THREE.BoxBufferGeometry(600, 600, 600);
     this.skyboxMiddle = new THREE.Mesh(skyBoxGeometry, materialArray);
-    this.skyboxMiddle.name = "middle";
+    this.skyboxMiddle.name = 'middle';
     const meshOptions = {
       opacity: 1,
-      transparent: false,
+      transparent: false
     };
     this.skyboxRight = new THREE.Mesh(
       outerBoxGeometry,
       new THREE.MeshPhongMaterial(meshOptions)
     );
-    this.skyboxRight.name = "right";
+    this.skyboxRight.name = 'right';
     this.skyboxLeft = new THREE.Mesh(
       outerBoxGeometry,
       new THREE.MeshPhongMaterial(meshOptions)
     );
-    this.skyboxLeft.name = "left";
+    this.skyboxLeft.name = 'left';
     this.skyboxFront = new THREE.Mesh(
       outerBoxGeometry,
       new THREE.MeshPhongMaterial(meshOptions)
     );
-    this.skyboxFront.name = "front";
+    this.skyboxFront.name = 'front';
     this.skyboxBack = new THREE.Mesh(
       outerBoxGeometry,
       new THREE.MeshPhongMaterial(meshOptions)
     );
-    this.skyboxBack.name = "back";
+    this.skyboxBack.name = 'back';
     this.skyboxRight.position.x = 780;
     // this.skyboxRight.rotation.y = 128;
     this.skyboxLeft.position.x = -780;
@@ -156,13 +157,17 @@ class CubeMap {
     this.scene.add(this.skyboxBack);
   };
 
+  setImages = (urls) => {
+    console.log('whot', urls);
+    this.urls = urls;
+  };
+
   createMaterialArray = () => {
-    const urls = [px, nx, py, ny, pz, nz];
-    const materialArray = urls.map((image) => {
-      let texture = new THREE.TextureLoader().load(image);
+    const materialArray = this.urls.map((image) => {
+      const texture = new THREE.TextureLoader().load(image);
       return new THREE.MeshBasicMaterial({
         map: texture,
-        side: THREE.BackSide,
+        side: THREE.BackSide
       });
     });
     this.initSkybox(materialArray);
@@ -173,7 +178,7 @@ class CubeMap {
   };
 
   initLights = () => {
-    //lights
+    // lights
     this.ambient = new THREE.AmbientLight(0xffffff);
     this.scene.add(this.ambient);
 
@@ -182,7 +187,7 @@ class CubeMap {
   };
 
   initControls = () => {
-    //controls
+    // controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enablePan = false;
     this.controls.enableZoom = true;
@@ -198,13 +203,13 @@ class CubeMap {
     const intersection = this.raycaster.intersectObject(this.skyboxMiddle);
     if (intersection.length > 0) {
       const { point } = intersection[0];
-      console.log("hotspot location", point);
-      console.log("camera position", this.camera.position);
+      console.log('hotspot location', point);
+      console.log('camera position', this.camera.position);
     }
   };
 
   initStats = () => {
-    //stats
+    // stats
     this.stats = new Stats();
     this.container.appendChild(this.stats.dom);
   };
@@ -234,7 +239,7 @@ class CubeMap {
     const point = new THREE.Vector3(x, y, z);
     const texture = new THREE.TextureLoader().load(img);
     const spriteMaterial = new THREE.SpriteMaterial({
-      map: texture,
+      map: texture
     });
     const sprite = new THREE.Sprite(spriteMaterial);
     sprite.name = name;
@@ -254,7 +259,7 @@ class CubeMap {
         {
           x: sprite.scale.x * 0.5,
           y: sprite.scale.y * 0.5,
-          z: sprite.scale.z * 0.5,
+          z: sprite.scale.z * 0.5
         },
         500
       )
