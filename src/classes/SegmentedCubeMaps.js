@@ -2,9 +2,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import Tween from '@tweenjs/tween.js';
-import DataImage from '../assets/Data';
 
-class CubeMap {
+class SegmentedCubeMaps {
   constructor(container) {
     this.container = container;
   }
@@ -19,7 +18,7 @@ class CubeMap {
     this.initStats();
     this.container.appendChild(this.renderer.domElement);
     this.container.addEventListener('mousemove', this.onMouseMove, false);
-    this.container.addEventListener('pointerdown', this.clearCube, false);
+    // this.container.addEventListener('pointerdown', this.clearCube, false);
     this.initControls();
     window.addEventListener('resize', this.onWindowResize, false);
   };
@@ -38,41 +37,12 @@ class CubeMap {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster.intersectObjects(this.scene.children);
     if (intersects.length > 0) {
-      const { object } = intersects[0];
-      if (
-        object.name !== 'middle' &&
-        !object.name.includes('hotspot') &&
-        !this.hotspotExist(object)
-      ) {
-        this.createHotspot(
-          {
-            x: object.position.x,
-            y: -10,
-            z: object.position.z,
-            name: `${object.name}-hotspot`,
-            key: 'test',
-            img: DataImage.Arrow,
-            level: 1
-          },
-          object
-        );
-      }
+      const { object, faceIndex } = intersects[0];
+      console.log(faceIndex);
+      object.geometry.faces[faceIndex].color.set(Math.random() * 0xffffff);
+      object.geometry.colorsNeedUpdate = true;
+      console.log(object);
     }
-  };
-
-  hotspotExist = (object) => {
-    let exist = false;
-    if (object.children.length > 0) {
-      for (let i = object.children.length - 1; i >= 0; i -= 1) {
-        const children = object.children[i];
-        if (children.name === `${object.name}-hotspot`) {
-          exist = true;
-          break;
-        }
-      }
-    }
-
-    return exist;
   };
 
   clearCube = () => {
@@ -86,7 +56,7 @@ class CubeMap {
 
   initScene = () => {
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color('white');
+    this.scene.background = new THREE.Color('black');
   };
 
   initCamera = () => {
@@ -94,14 +64,14 @@ class CubeMap {
       75,
       this.container.clientWidth / this.container.clientHeight,
       1,
-      1000
+      5000
     );
     this.camera.position.z = Math.PI;
   };
 
   initRenderer = () => {
     // renderer
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = new THREE.WebGLRenderer();
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(
       this.container.clientWidth,
@@ -110,53 +80,14 @@ class CubeMap {
   };
 
   initSkybox = async (materialArray) => {
-    const skyBoxGeometry = new THREE.BoxGeometry(1000, 1000, 1000);
-    // try the rectangle approach
-    const outerBoxGeometry = new THREE.BoxBufferGeometry(1, 100, 1000, 1, 1, 1);
+    const skyBoxGeometry = new THREE.BoxGeometry(1000, 1000, 1000, 2, 2, 2);
+    const mat = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
+    const wireframe = new THREE.LineSegments(skyBoxGeometry, mat);
     this.skyboxMiddle = new THREE.Mesh(skyBoxGeometry, materialArray);
+    this.skyboxMiddle.add(wireframe);
     this.skyboxMiddle.name = 'middle';
-    const meshOptions = {
-      opacity: 1,
-      transparent: true
-    };
-    this.skyboxRight = new THREE.Mesh(
-      outerBoxGeometry,
-      new THREE.MeshPhongMaterial(meshOptions)
-    );
-    this.skyboxRight.name = 'right';
-    this.skyboxLeft = new THREE.Mesh(
-      outerBoxGeometry,
-      new THREE.MeshPhongMaterial(meshOptions)
-    );
-    this.skyboxLeft.name = 'left';
-    this.skyboxFront = new THREE.Mesh(
-      outerBoxGeometry,
-      new THREE.MeshPhongMaterial(meshOptions)
-    );
-    this.skyboxFront.name = 'front';
-    this.skyboxBack = new THREE.Mesh(
-      outerBoxGeometry,
-      new THREE.MeshPhongMaterial(meshOptions)
-    );
-    this.skyboxBack.name = 'back';
 
-    // doesn´t need rotation
-    this.skyboxRight.position.x = 500;
-    this.skyboxRight.position.y = -50;
-    this.skyboxLeft.position.x = -500;
-    this.skyboxLeft.position.y = -50;
-    // need rotation
-    this.skyboxFront.position.z = 500;
-    this.skyboxFront.position.y = -50;
-    this.skyboxFront.rotation.y = 1.57;
-    this.skyboxBack.position.z = -500;
-    this.skyboxBack.position.y = -50;
-    this.skyboxBack.rotation.y = 1.57;
     this.scene.add(this.skyboxMiddle);
-    this.scene.add(this.skyboxRight);
-    this.scene.add(this.skyboxLeft);
-    this.scene.add(this.skyboxFront);
-    this.scene.add(this.skyboxBack);
   };
 
   setImages = (urls) => {
@@ -168,8 +99,9 @@ class CubeMap {
       const texture = new THREE.TextureLoader().load(image);
       return new THREE.MeshBasicMaterial({
         map: texture,
-        side: THREE.BackSide,
-        wireframe: false
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+        vertexColors: true
       });
     });
     this.initSkybox(materialArray);
@@ -271,4 +203,4 @@ class CubeMap {
       })
       .easing(Tween.Easing.Elastic.Out);
 }
-export default CubeMap;
+export default SegmentedCubeMaps;

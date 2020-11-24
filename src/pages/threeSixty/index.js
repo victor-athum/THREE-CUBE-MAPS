@@ -1,7 +1,7 @@
-import { arrayOf, func, shape } from 'prop-types';
+import { arrayOf, func, shape, string } from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import MultipleCubeMaps from '../../classes/MultipleCubeMaps';
+import SegmentedCubeMaps from '../../classes/SegmentedCubeMaps';
 import ThreeSixtyAction from '../../stores/threeSixty/actions';
 
 class ThreeSixty extends Component {
@@ -15,7 +15,7 @@ class ThreeSixty extends Component {
     const { dispatch } = this.props;
     const { model } = await dispatch(ThreeSixtyAction.getScenes());
 
-    const cubeMap = new MultipleCubeMaps(this.container);
+    const cubeMap = new SegmentedCubeMaps(this.container);
     cubeMap.init(model.cube);
     cubeMap.animate();
   }
@@ -54,7 +54,7 @@ const mapStateToProps = (state) => {
 };
 
 ThreeSixty.propTypes = {
-  cube: shape({}).isRequired,
+  cube: arrayOf(string).isRequired,
   levels: arrayOf(shape({})).isRequired,
   dispatch: func.isRequired
 };

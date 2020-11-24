@@ -3,7 +3,7 @@ import ThreeSixtyAction from '../actions';
 
 export default class ThreeSixtyReducer extends BaseReducer {
   initialState = {
-    cube: {},
+    cube: [],
     scenes: [],
     menu: [],
     builderLogo: '',
