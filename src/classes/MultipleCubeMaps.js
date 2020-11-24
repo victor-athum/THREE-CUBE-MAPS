@@ -115,7 +115,15 @@ class CubeMap {
 
   initSkybox = async (materialArray) => {
     const skyBoxGeometry = new THREE.BoxBufferGeometry(1000, 1000, 1000);
-    const outerBoxGeometry = new THREE.BoxBufferGeometry(600, 600, 600);
+    // try the rectangle approach
+    const outerBoxGeometry = new THREE.BoxBufferGeometry(
+      30,
+      100,
+      1000,
+      1,
+      1,
+      1
+    );
     this.skyboxMiddle = new THREE.Mesh(skyBoxGeometry, materialArray);
     this.skyboxMiddle.name = 'middle';
     const meshOptions = {
@@ -142,14 +150,19 @@ class CubeMap {
       new THREE.MeshPhongMaterial(meshOptions)
     );
     this.skyboxBack.name = 'back';
-    this.skyboxRight.position.x = 780;
-    // this.skyboxRight.rotation.y = 128;
-    this.skyboxLeft.position.x = -780;
-    // this.skyboxLeft.rotation.y = 128;
-    this.skyboxFront.position.z = 780;
-    // this.skyboxFront.rotation.y = 128;
-    this.skyboxBack.position.z = -780;
-    // this.skyboxBack.rotation.y = 128;
+
+    // doesn´t need rotation
+    this.skyboxRight.position.x = 500;
+    this.skyboxRight.position.y = -50;
+    this.skyboxLeft.position.x = -500;
+    this.skyboxLeft.position.y = -50;
+    // need rotation
+    this.skyboxFront.position.z = 500;
+    this.skyboxFront.position.y = -50;
+    this.skyboxFront.rotation.y = 1.55;
+    this.skyboxBack.position.z = -500;
+    this.skyboxBack.position.y = -50;
+    this.skyboxBack.rotation.y = 1.55;
     this.scene.add(this.skyboxMiddle);
     this.scene.add(this.skyboxRight);
     this.scene.add(this.skyboxLeft);
