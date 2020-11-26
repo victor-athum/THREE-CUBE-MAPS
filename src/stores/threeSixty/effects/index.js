@@ -1,6 +1,6 @@
 import HttpErrorResponseModel from '../../../models/HttpErrorResponseModel';
 import UrlModel from '../models/UrlModel';
-import CubeTest1 from '../../../TestCubes';
+import { CubeTest1, CubeTest2 } from '../../../TestCubes';
 import CubeModel from '../models/CubeModel';
 
 export default class ThreeSixtyEffect {
@@ -13,7 +13,7 @@ export default class ThreeSixtyEffect {
     style,
     mode
   ) {
-    const url = new UrlModel(CubeTest1);
+    const url = new UrlModel(CubeTest2);
     const cube = new CubeModel(url);
     console.log('cube', cube);
     return cube;

@@ -38,10 +38,9 @@ class SegmentedCubeMaps {
     const intersects = this.raycaster.intersectObjects(this.scene.children);
     if (intersects.length > 0) {
       const { object, faceIndex } = intersects[0];
-      console.log(faceIndex);
+      console.log(object, faceIndex);
       object.geometry.faces[faceIndex].color.set(Math.random() * 0xffffff);
       object.geometry.colorsNeedUpdate = true;
-      console.log(object);
     }
   };
 
@@ -80,11 +79,11 @@ class SegmentedCubeMaps {
   };
 
   initSkybox = async (materialArray) => {
-    const skyBoxGeometry = new THREE.BoxGeometry(1000, 1000, 1000, 2, 2, 2);
-    const mat = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
-    const wireframe = new THREE.LineSegments(skyBoxGeometry, mat);
+    const skyBoxGeometry = new THREE.BoxGeometry(1000, 1000, 1000, 3, 3, 3);
+    // const mat = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
+    // const wireframe = new THREE.LineSegments(skyBoxGeometry, mat);
     this.skyboxMiddle = new THREE.Mesh(skyBoxGeometry, materialArray);
-    this.skyboxMiddle.add(wireframe);
+    // this.skyboxMiddle.add(wireframe);
     this.skyboxMiddle.name = 'middle';
 
     this.scene.add(this.skyboxMiddle);
