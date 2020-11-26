@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import Tween from '@tweenjs/tween.js';
+import DataImage from '../assets/Data';
 
 class SegmentedCubeMaps {
   constructor(container) {
@@ -41,7 +42,52 @@ class SegmentedCubeMaps {
       console.log(object, faceIndex);
       object.geometry.faces[faceIndex].color.set(Math.random() * 0xffffff);
       object.geometry.colorsNeedUpdate = true;
+      if (!this.hotspotExist(object)) {
+        const { x, y, z } = this.getHotspotPosition(object, faceIndex);
+        this.createHotspot(
+          {
+            x,
+            y,
+            z,
+            name: `${object.name}-hotspot`,
+            key: 'test',
+            img: DataImage.Arrow,
+            level: 1
+          },
+          object
+        );
+      }
     }
+  };
+
+  getHotspotPosition = (object, faceIndex) => {
+    const { geometry } = object;
+    const { faces, vertices } = geometry;
+    const face = faces[faceIndex];
+
+    const v1 = vertices[face.a];
+    const v2 = vertices[face.b];
+    const v3 = vertices[face.c];
+
+    const x = (v1.x + v2.x + v3.x) / 3;
+    const y = (v1.y + v2.y + v3.y) / 3;
+    const z = (v1.z + v2.z + v3.z) / 3;
+    return { x, y, z };
+  };
+
+  hotspotExist = (object) => {
+    let exist = false;
+    if (object.children.length > 0) {
+      for (let i = object.children.length - 1; i >= 0; i -= 1) {
+        const children = object.children[i];
+        if (children.name === `${object.name}-hotspot`) {
+          exist = true;
+          break;
+        }
+      }
+    }
+
+    return exist;
   };
 
   clearCube = () => {
@@ -79,7 +125,7 @@ class SegmentedCubeMaps {
   };
 
   initSkybox = async (materialArray) => {
-    const skyBoxGeometry = new THREE.BoxGeometry(1000, 1000, 1000, 3, 3, 3);
+    const skyBoxGeometry = new THREE.BoxGeometry(1000, 1000, 1000, 2, 2, 2);
     // const mat = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
     // const wireframe = new THREE.LineSegments(skyBoxGeometry, mat);
     this.skyboxMiddle = new THREE.Mesh(skyBoxGeometry, materialArray);
