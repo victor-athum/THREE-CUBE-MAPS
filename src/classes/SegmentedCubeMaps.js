@@ -111,7 +111,7 @@ class SegmentedCubeMaps {
       1,
       5000
     );
-    this.camera.position.z = Math.PI;
+    this.camera.position.z = 0.1;
   };
 
   initRenderer = () => {
@@ -211,6 +211,7 @@ class SegmentedCubeMaps {
 
   render = () => {
     this.renderer.render(this.scene, this.camera);
+    console.log(this.camera);
     this.stats.update();
   };
 
