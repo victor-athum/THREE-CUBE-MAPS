@@ -146,16 +146,15 @@ class SegmentedCubeMaps {
         cubeMapTexture.magFilter = THREE.LinearFilter;
         cubeMapTexture.minFilter = THREE.LinearMipMapLinearFilter;
 
-        const material = new THREE.MeshBasicMaterial({
+        const meshPhong = new THREE.MeshPhongMaterial({
+          opacity: 0,
+          transparent: true,
           side: THREE.DoubleSide,
-          opacity: 1,
-          wireframe: true,
-          vertexColors: true,
-          overdraw: false
+          envMap: cubeMapTexture
         });
 
         const skyBoxGeometry = new THREE.BoxGeometry(1000, 1000, 1000, 2, 2, 2);
-        const mesh = new THREE.Mesh(skyBoxGeometry, material);
+        const mesh = new THREE.Mesh(skyBoxGeometry, meshPhong);
         this.scene.add(mesh);
         this.scene.background = cubeMapTexture;
         console.log(this.scene);
