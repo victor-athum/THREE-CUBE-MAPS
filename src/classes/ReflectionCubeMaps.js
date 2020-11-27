@@ -9,11 +9,10 @@ class SegmentedCubeMaps {
     this.container = container;
   }
 
-  init = (urls) => {
-    this.initScene();
+  init = () => {
     this.initCamera();
-    this.setImages(urls);
-    this.createMaterialArray();
+    this.initScene();
+    this.initializeSkyBox();
     this.initializeRaycaster();
     this.initRenderer();
     this.initStats();
@@ -101,7 +100,6 @@ class SegmentedCubeMaps {
 
   initScene = () => {
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color('black');
   };
 
   initCamera = () => {
@@ -137,6 +135,32 @@ class SegmentedCubeMaps {
 
   setImages = (urls) => {
     this.urls = urls;
+  };
+
+  initializeSkyBox = () => {
+    const time = new Date().getTime();
+    const cubeMapTexture = new THREE.TextureLoader().load(
+      `https://360-image-collection-3js.s3-us-west-2.amazonaws.com/e2b94523-d282-4d97-8c4d-92f84c3c45a6/28/WesterlyA1-KitchenModernF01.jpg?${time}`,
+      () => {
+        cubeMapTexture.mapping = THREE.EquirectangularReflectionMapping;
+        cubeMapTexture.magFilter = THREE.LinearFilter;
+        cubeMapTexture.minFilter = THREE.LinearMipMapLinearFilter;
+
+        const material = new THREE.MeshBasicMaterial({
+          side: THREE.DoubleSide,
+          opacity: 1,
+          wireframe: true,
+          vertexColors: true,
+          overdraw: false
+        });
+
+        const skyBoxGeometry = new THREE.BoxGeometry(1000, 1000, 1000, 2, 2, 2);
+        const mesh = new THREE.Mesh(skyBoxGeometry, material);
+        this.scene.add(mesh);
+        this.scene.background = cubeMapTexture;
+        console.log(this.scene);
+      }
+    );
   };
 
   createMaterialArray = () => {

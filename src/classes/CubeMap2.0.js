@@ -1,6 +1,6 @@
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import Stats from "three/examples/jsm/libs/stats.module";
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Stats from 'three/examples/jsm/libs/stats.module';
 
 class CubeMap {
   constructor(container) {
@@ -15,7 +15,7 @@ class CubeMap {
     this.initRenderer();
     this.initControls();
     this.initStats();
-    window.addEventListener("resize", this.onWindowResize, false);
+    window.addEventListener('resize', this.onWindowResize, false);
   };
 
   initCamera = () => {
@@ -30,7 +30,7 @@ class CubeMap {
 
   initTexture = () => {
     const cubeMap = new THREE.TextureLoader().load(
-      "https://360-image-collection-3js.s3-us-west-2.amazonaws.com/e2b94523-d282-4d97-8c4d-92f84c3c45a6/28/WesterlyA1-KitchenModernF01.jpg",
+      'https://360-image-collection-3js.s3-us-west-2.amazonaws.com/e2b94523-d282-4d97-8c4d-92f84c3c45a6/28/WesterlyA1-KitchenModernF01.jpg',
       (map) => {
         cubeMap.mapping = THREE.EquirectangularReflectionMapping;
         cubeMap.magFilter = THREE.LinearFilter;

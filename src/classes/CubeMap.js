@@ -1,20 +1,21 @@
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import Stats from "three/examples/jsm/libs/stats.module";
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Stats from 'three/examples/jsm/libs/stats.module';
 
-const px = require("../assets/px.jpg");
-const nx = require("../assets/nx.jpg");
-const py = require("../assets/py.jpg");
-const ny = require("../assets/ny.jpg");
-const pz = require("../assets/pz.jpg");
-const nz = require("../assets/nz.jpg");
+const px = require('../assets/px.jpg');
+const nx = require('../assets/nx.jpg');
+const py = require('../assets/py.jpg');
+const ny = require('../assets/ny.jpg');
+const pz = require('../assets/pz.jpg');
+const nz = require('../assets/nz.jpg');
 
 class CubeMap {
   constructor(container) {
     this.container = container;
   }
 
-  init = () => {
+  init = (urls) => {
+    this.urls = urls;
     this.initCamera();
     this.initCubeMap();
     this.initScene();
@@ -22,7 +23,7 @@ class CubeMap {
     this.initRenderer();
     this.initControls();
     this.initStats();
-    window.addEventListener("resize", this.onWindowResize, false);
+    window.addEventListener('resize', this.onWindowResize, false);
   };
 
   initCamera = () => {
@@ -36,8 +37,7 @@ class CubeMap {
   };
 
   initCubeMap = () => {
-    const urls = [px, nx, py, ny, pz, nz];
-    this.reflectionCube = new THREE.CubeTextureLoader().load(urls);
+    this.reflectionCube = new THREE.CubeTextureLoader().load(this.urls);
   };
 
   initScene = () => {

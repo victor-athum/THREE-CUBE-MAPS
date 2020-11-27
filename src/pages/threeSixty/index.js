@@ -1,7 +1,7 @@
 import { arrayOf, func, shape, string } from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import SegmentedCubeMaps from '../../classes/SegmentedCubeMaps';
+import CubeMap from '../../classes/ReflectionCubeMaps';
 import ThreeSixtyAction from '../../stores/threeSixty/actions';
 
 class ThreeSixty extends Component {
@@ -15,7 +15,7 @@ class ThreeSixty extends Component {
     const { dispatch } = this.props;
     const { model } = await dispatch(ThreeSixtyAction.getScenes());
 
-    const cubeMap = new SegmentedCubeMaps(this.container);
+    const cubeMap = new CubeMap(this.container);
     cubeMap.init(model.cube);
     cubeMap.animate();
   }
