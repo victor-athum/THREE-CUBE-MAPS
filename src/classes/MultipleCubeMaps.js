@@ -169,7 +169,8 @@ class CubeMap {
       return new THREE.MeshBasicMaterial({
         map: texture,
         side: THREE.BackSide,
-        wireframe: false
+        wireframe: false,
+        vertexColors: true
       });
     });
     this.initSkybox(materialArray);

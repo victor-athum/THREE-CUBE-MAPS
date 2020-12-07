@@ -18,7 +18,10 @@ class SegmentedCubeMaps {
     this.initStats();
     this.container.appendChild(this.renderer.domElement);
     this.container.addEventListener('mousemove', this.onMouseMove, false);
-    // this.container.addEventListener('pointerdown', this.clearCube, false);
+    this.container.addEventListener('pointerdown', this.onMouseDown, false);
+    this.container.addEventListener('touchstart', this.onMouseDown, false);
+    // this.container.addEventListener('touchend', this.onTouchEnd, false);
+    this.container.addEventListener('touchmove', this.onMouseMove, false);
     this.initControls();
     window.addEventListener('resize', this.onWindowResize, false);
   };
@@ -34,6 +37,16 @@ class SegmentedCubeMaps {
 
   onMouseMove = (event) => {
     this.getMouse(event);
+    this.onRaycaster();
+  };
+
+  onMouseDown = (event) => {
+    console.log('MOuseDown', event);
+    this.getMouse(event);
+    this.onRaycaster();
+  };
+
+  onRaycaster = () => {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster.intersectObjects(this.scene.children);
     if (intersects.length > 0) {
@@ -147,13 +160,22 @@ class SegmentedCubeMaps {
         cubeMapTexture.minFilter = THREE.LinearMipMapLinearFilter;
 
         const meshPhong = new THREE.MeshPhongMaterial({
-          opacity: 0,
-          transparent: true,
+          opacity: 1,
+          transparent: false,
           side: THREE.DoubleSide,
-          envMap: cubeMapTexture
+          envMap: cubeMapTexture,
+          vertexColors: true,
+          wireframe: true
         });
 
-        const skyBoxGeometry = new THREE.BoxGeometry(1000, 1000, 1000, 2, 2, 2);
+        const skyBoxGeometry = new THREE.BoxGeometry(
+          1000,
+          1000,
+          1000,
+          10,
+          10,
+          10
+        );
         const mesh = new THREE.Mesh(skyBoxGeometry, meshPhong);
         this.scene.add(mesh);
         this.scene.background = cubeMapTexture;
@@ -234,6 +256,7 @@ class SegmentedCubeMaps {
 
   render = () => {
     this.renderer.render(this.scene, this.camera);
+    // console.log(this.camera.position);
     this.stats.update();
   };
 
